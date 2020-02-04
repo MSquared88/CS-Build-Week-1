@@ -6,7 +6,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-vscode/settings.json
+.vscode/settings.json
 
 # Django stuff:
 *.log
