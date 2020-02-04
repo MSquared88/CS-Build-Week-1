@@ -6,12 +6,12 @@ from rest_framework.authtoken.models import Token
 import uuid
 
 class Room(models.Model):
-    title = models.CharField(max_length=50, default="DEFAULT TITLE")
-    description = models.CharField(max_length=500, default="DEFAULT DESCRIPTION")
-    n_to = models.IntegerField(default=0)
-    s_to = models.IntegerField(default=0)
-    e_to = models.IntegerField(default=0)
-    w_to = models.IntegerField(default=0)
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=500)
+    n_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="n_room")
+    s_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="s_room")
+    e_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="e_room")
+    w_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="w_room")
     def connectRooms(self, destinationRoom, direction):
         destinationRoomID = destinationRoom.id
         try:
