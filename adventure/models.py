@@ -12,6 +12,7 @@ class Room(models.Model):
     s_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="s_room")
     e_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="e_room")
     w_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="w_room")
+    inventory = models.ForeignKey("Inventory", unique=True)
     def connectRooms(self, destinationRoom, direction):
         destinationRoomID = destinationRoom.id
         try:
@@ -37,6 +38,23 @@ class Room(models.Model):
         return [p.uuid for p in Player.objects.filter(currentRoom=self.id) if p.id != int(currentPlayerID)]
     def __str__(self):
         return f"{self.title} ({self.id})"
+
+class Item(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.CharField(max_length=500)
+
+    def __str__(self):
+        return self.name
+
+class ItemInstance(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    data = models.TextField(default="{}")
+    
+    def __str__(self):
+        return f"{str(self.item)} ({self.id})"
+
+class Inventory(models.Model):
+    items = models.ManyToManyField(ItemInstance)
 
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
