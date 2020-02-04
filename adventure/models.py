@@ -12,7 +12,7 @@ class Room(models.Model):
     s_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="s_room")
     e_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="e_room")
     w_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="w_room")
-    inventory = models.ForeignKey("Inventory", unique=True)
+    inventory = models.ForeignKey("Inventory", on_delete=models.DO_NOTHING, unique=True)
     def connectRooms(self, destinationRoom, direction):
         destinationRoomID = destinationRoom.id
         try:
