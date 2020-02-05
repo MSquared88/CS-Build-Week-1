@@ -20,7 +20,7 @@ class ItemInstance(models.Model):
         return f"{str(self.item)} ({self.id})"
 
 class Inventory(models.Model):
-    items = models.ManyToManyField(ItemInstance)
+    items = models.ManyToManyField(ItemInstance, blank=True, null=True)
 
 class Enemy(models.Model):
     name = models.CharField(max_length=50)
