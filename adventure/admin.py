@@ -13,7 +13,15 @@ class ItemInstanceAdmin(admin.ModelAdmin):
 class InventoryAdmin(admin.ModelAdmin):
     pass
 
+class PlayerAdmin(admin.ModelAdmin):
+    pass
+
+class EnemyAdmin(admin.ModelAdmin):
+    pass
+
 admin.site.register(Room, RoomAdmin)
 admin.site.register(Item, ItemAdmin)
 admin.site.register(ItemInstance, ItemInstanceAdmin)
 admin.site.register(Inventory, InventoryAdmin)
+admin.site.register(Player, PlayerAdmin)
+admin.site.register(Enemy, EnemyAdmin)

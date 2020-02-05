@@ -5,6 +5,33 @@ from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 import uuid
 
+class Item(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.CharField(max_length=500)
+
+    def __str__(self):
+        return self.name
+
+class ItemInstance(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    data = models.TextField(default="{}")
+    
+    def __str__(self):
+        return f"{str(self.item)} ({self.id})"
+
+class Inventory(models.Model):
+    items = models.ManyToManyField(ItemInstance)
+
+class Enemy(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.CharField(max_length=500)
+    attack = models.PositiveIntegerField(default=10)
+    defense = models.PositiveIntegerField(default=10)
+    hp = models.PositiveIntegerField(default=100)
+
+    def __str__(self):
+        return f"{self.name} ({self.id})"
+
 class Room(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
@@ -12,7 +39,8 @@ class Room(models.Model):
     s_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="s_room")
     e_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="e_room")
     w_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="w_room")
-    inventory = models.ForeignKey("Inventory", on_delete=models.DO_NOTHING, unique=True)
+    inventory = models.OneToOneField(Inventory, on_delete=models.DO_NOTHING, null=True)
+    enemy = models.OneToOneField(Enemy, on_delete=models.DO_NOTHING, null=True)
     def connectRooms(self, destinationRoom, direction):
         destinationRoomID = destinationRoom.id
         try:
@@ -39,27 +67,13 @@ class Room(models.Model):
     def __str__(self):
         return f"{self.title} ({self.id})"
 
-class Item(models.Model):
-    name = models.CharField(max_length=50)
-    description = models.CharField(max_length=500)
-
-    def __str__(self):
-        return self.name
-
-class ItemInstance(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
-    data = models.TextField(default="{}")
-    
-    def __str__(self):
-        return f"{str(self.item)} ({self.id})"
-
-class Inventory(models.Model):
-    items = models.ManyToManyField(ItemInstance)
-
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    currentRoom = models.IntegerField(default=0)
+    currentRoom = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True)
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    inventory = models.OneToOneField(Inventory, on_delete=models.DO_NOTHING, null=True)
+    hp = models.PositiveIntegerField(default=100)
+    mp = models.PositiveIntegerField(default=100)
     def initialize(self):
         if self.currentRoom == 0:
             self.currentRoom = Room.objects.first().id
@@ -70,6 +84,9 @@ class Player(models.Model):
         except Room.DoesNotExist:
             self.initialize()
             return self.room()
+    
+    def __str__(self):
+        return self.user.username
 
 @receiver(post_save, sender=User)
 def create_user_player(sender, instance, created, **kwargs):
