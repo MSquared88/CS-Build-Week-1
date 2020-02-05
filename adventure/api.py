@@ -6,7 +6,10 @@ from decouple import config
 from django.contrib.auth.models import User
 from .models import *
 from rest_framework.decorators import api_view
+from rest_framework import status
+from django.forms.models import model_to_dict
 import json
+import random
 
 # instantiate pusher
 # pusher = Pusher(app_id=config('PUSHER_APP_ID'), key=config('PUSHER_KEY'), secret=config('PUSHER_SECRET'), cluster=config('PUSHER_CLUSTER'))
@@ -60,7 +63,47 @@ def move(request):
         players = room.playerNames(player_id)
         return JsonResponse({'name': player.user.username, 'title': room.title, 'description': room.description, 'players': players, 'error_msg': "You cannot move that way."}, safe=True)
 
+@api_view(["POST"])
+def attack(request):
+    player = request.user.player
+    enemy = player.currentRoom.enemy
+    player_hp = player.hp # Their HP will get reset if they die.
 
+    if enemy:
+        player_should_hit = random.random() > 0.2
+        enemy_should_hit = random.random() > 0.2
+
+        if player_should_hit:
+            enemy.hp -= random.randint(1, 5)
+        
+        if enemy_should_hit:
+            player.hp -= random.randint(1, enemy.attack)
+
+            if player.hp <= 0:
+                player_hp = player.hp
+                player.hp = 100
+                player.currentRoom = Room.objects.first()
+
+            player.save()
+        
+        if enemy.hp <= 0:
+            enemy.delete()
+        else:
+            enemy.save()
+        
+        if player_hp <= 0:
+            return JsonResponse({"revival_room": model_to_dict(player.currentRoom)})
+
+        return JsonResponse({
+            "player": {
+                "hp": player_hp if player_hp > 0 else 0
+            },
+            "enemy": {
+                "hp": enemy.hp if enemy.hp > 0 else 0
+            }
+        })
+
+    return JsonResponse({"error": "There is no enemy in this room."})
 @csrf_exempt
 @api_view(["POST"])
 def say(request):

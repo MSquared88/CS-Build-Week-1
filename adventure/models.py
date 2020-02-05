@@ -45,8 +45,8 @@ class Room(models.Model):
     s_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="s_room")
     e_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="e_room")
     w_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="w_room")
-    inventory = models.OneToOneField(Inventory, on_delete=models.DO_NOTHING, blank=True, null=True)
-    enemy = models.OneToOneField(EnemyInstance, on_delete=models.DO_NOTHING, blank=True, null=True)
+    inventory = models.OneToOneField(Inventory, on_delete=models.SET_NULL, blank=True, null=True)
+    enemy = models.OneToOneField(EnemyInstance, on_delete=models.SET_NULL, blank=True, null=True)
     def connectRooms(self, destinationRoom, direction):
         destinationRoomID = destinationRoom.id
         try:
@@ -77,9 +77,15 @@ class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     currentRoom = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True)
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
-    inventory = models.OneToOneField(Inventory, on_delete=models.DO_NOTHING, null=True)
+    inventory = models.OneToOneField(Inventory, on_delete=models.SET_NULL, null=True)
     hp = models.PositiveIntegerField(default=100)
     mp = models.PositiveIntegerField(default=100)
+
+    def save(self, *args, **kwargs):
+        self.inventory = Inventory()
+        self.inventory.save()
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+
     def initialize(self):
         if self.currentRoom == 0:
             self.currentRoom = Room.objects.first().id
