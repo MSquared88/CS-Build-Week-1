@@ -45,8 +45,8 @@ class Room(models.Model):
     s_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="s_room")
     e_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="e_room")
     w_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="w_room")
-    inventory = models.OneToOneField(Inventory, on_delete=models.DO_NOTHING, null=True)
-    enemy = models.OneToOneField(EnemyInstance, on_delete=models.DO_NOTHING, null=True)
+    inventory = models.OneToOneField(Inventory, on_delete=models.DO_NOTHING, blank=True, null=True)
+    enemy = models.OneToOneField(EnemyInstance, on_delete=models.DO_NOTHING, blank=True, null=True)
     def connectRooms(self, destinationRoom, direction):
         destinationRoomID = destinationRoom.id
         try:
