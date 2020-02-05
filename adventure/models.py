@@ -25,12 +25,18 @@ class Inventory(models.Model):
 class Enemy(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
-    attack = models.PositiveIntegerField(default=10)
-    defense = models.PositiveIntegerField(default=10)
-    hp = models.PositiveIntegerField(default=100)
 
     def __str__(self):
-        return f"{self.name} ({self.id})"
+        return self.name
+
+class EnemyInstance(models.Model):
+    enemy = models.ForeignKey(Enemy, on_delete=models.CASCADE)
+    attack = models.PositiveIntegerField(default=10)
+    defense = models.PositiveIntegerField(default=10)
+    hp = models.PositiveIntegerField(default=10)
+
+    def __str__(self):
+        return f"{str(self.enemy)} ({self.id})"
 
 class Room(models.Model):
     title = models.CharField(max_length=50)
@@ -40,7 +46,7 @@ class Room(models.Model):
     e_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="e_room")
     w_to = models.ForeignKey("Room", on_delete=models.SET_NULL, blank=True, null=True, related_name="w_room")
     inventory = models.OneToOneField(Inventory, on_delete=models.DO_NOTHING, null=True)
-    enemy = models.OneToOneField(Enemy, on_delete=models.DO_NOTHING, null=True)
+    enemy = models.OneToOneField(EnemyInstance, on_delete=models.DO_NOTHING, null=True)
     def connectRooms(self, destinationRoom, direction):
         destinationRoomID = destinationRoom.id
         try:
