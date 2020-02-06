@@ -90,7 +90,7 @@ def attack(request):
 
             player.save()
         
-        enemy_name = enemy.name
+        enemy_name = enemy.enemy.name
         
         if enemy.hp <= 0:
             enemy.delete()
