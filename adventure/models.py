@@ -82,8 +82,13 @@ class Player(models.Model):
     mp = models.PositiveIntegerField(default=100)
 
     def save(self, *args, **kwargs):
-        self.inventory = Inventory()
-        self.inventory.save()
+        if not self.inventory:
+            self.inventory = Inventory()
+            self.inventory.save()
+        
+        if not self.room:
+            self.room = Room.objects.get(id=1)
+
         super().save(*args, **kwargs)  # Call the "real" save() method.
 
     def initialize(self):

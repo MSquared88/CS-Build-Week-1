@@ -41,7 +41,7 @@ def move(request):
     player_uuid = player.uuid
     data = json.loads(request.body)
     direction = data['direction']
-    room = player.room()
+    room = player.currentRoom
     nextRoomID = None
     if direction == "n":
         nextRoomID = room.n_to
