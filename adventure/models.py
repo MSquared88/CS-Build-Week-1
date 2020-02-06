@@ -86,8 +86,8 @@ class Player(models.Model):
             self.inventory = Inventory()
             self.inventory.save()
         
-        if not self.room:
-            self.room = Room.objects.get(id=8)
+        if not self.currentRoom:
+            self.currentRoom = Room.objects.get(id=8)
 
         super().save(*args, **kwargs)  # Call the "real" save() method.
 
