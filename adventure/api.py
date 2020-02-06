@@ -27,8 +27,14 @@ def initialize(request):
     player_id = player.id
     uuid = player.uuid
     room = player.currentRoom
+    enemy = player.currentRoom.enemy
     players = room.playerNames(player_id)
-    return JsonResponse({'uuid': uuid, 'name': player.user.username, 'hp': player.hp, 'title': room.title, 'description': room.description, 'players': players}, safe=True)
+    data = {'uuid': uuid, 'name': player.user.username, 'hp': player.hp, 'title': room.title, 'description': room.description, 'players': players}
+
+    if enemy:
+        data['enemy'] = {'name': enemy.enemy.name, 'hp': enemy.enemy.hp}
+
+    return JsonResponse(data, safe=True)
 
 
 # @csrf_exempt
@@ -62,7 +68,12 @@ def move(request):
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has walked {dirs[direction]}.'})
         # for p_uuid in nextPlayerUUIDs:
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has entered from the {reverse_dirs[direction]}.'})
-        return JsonResponse({'name': player.user.username, 'title': nextRoom.title, 'description': nextRoom.description, 'players': players, 'error_msg': ""}, safe=True)
+        data = {'name': player.user.username, 'title': nextRoom.title, 'description': nextRoom.description, 'players': players, 'error_msg': ""}
+
+        if nextRoom.enemy:
+            data['enemy'] = {'name': nextRoom.enemy.enemy.name, 'hp': nextRoom.enemy.enemy.hp}
+
+        return JsonResponse(data, safe=True)
     else:
         players = room.playerNames(player_id)
         return JsonResponse({'name': player.user.username, 'title': room.title, 'description': room.description, 'players': players, 'error_msg': "You cannot move that way."}, safe=True)
@@ -86,7 +97,7 @@ def attack(request):
             if player.hp <= 0:
                 player_hp = player.hp
                 player.hp = 100
-                player.currentRoom = Room.objects.first()
+                player.currentRoom = Room.objects.get(id=8)
 
             player.save()
         
@@ -99,14 +110,18 @@ def attack(request):
         
         if player_hp <= 0:
             players = player.currentRoom.playerNames(player.id)
-            
-            return JsonResponse({
+            data = {
                 'message:': 'You have died.',
                 'hp': player.hp,
                 'title': player.currentRoom.title,
                 'description': player.currentRoom.description,
-                'players': players}, safe=True
-            )
+                'players': players
+            }
+            
+            if player.currentRoom.enemy:
+                data['enemy'] = {'name': player.currentRoom.enemy.enemy.name, 'hp': player.currentRoom.enemy.enemy.hp}
+
+            return JsonResponse(data, safe=True)
 
         return JsonResponse({
             "message": "You {player_hit} the {enemy_name}. They {enemy_hit} you.".format(
