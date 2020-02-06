@@ -28,7 +28,7 @@ def initialize(request):
     uuid = player.uuid
     room = player.currentRoom
     players = room.playerNames(player_id)
-    return JsonResponse({'uuid': uuid, 'name': player.user.username, 'title': room.title, 'description': room.description, 'players': players}, safe=True)
+    return JsonResponse({'uuid': uuid, 'name': player.user.username, 'hp': player.hp, 'title': room.title, 'description': room.description, 'players': players}, safe=True)
 
 
 # @csrf_exempt
@@ -90,15 +90,26 @@ def attack(request):
 
             player.save()
         
+        enemy_name = enemy.name
+        
         if enemy.hp <= 0:
             enemy.delete()
         else:
             enemy.save()
         
         if player_hp <= 0:
-            return JsonResponse({"revival_room": model_to_dict(player.currentRoom)})
+            players = player.currentRoom.playerNames(player.id)
+            
+            return JsonResponse({
+                'message:': 'You have died.',
+                'hp': player.hp,
+                'title': player.currentRoom.title,
+                'description': player.currentRoom.description,
+                'players': players}, safe=True
+            )
 
         return JsonResponse({
+            "message": f"You {"hit" if player_should_hit else "miss"} the {enemy_name}. They {"hit" if enemy_should_hit else "miss"} you.",
             "player": {
                 "hp": player_hp if player_hp > 0 else 0
             },
