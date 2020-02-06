@@ -109,7 +109,11 @@ def attack(request):
             )
 
         return JsonResponse({
-            "message": f"You {"hit" if player_should_hit else "miss"} the {enemy_name}. They {"hit" if enemy_should_hit else "miss"} you.",
+            "message": "You {player_hit} the {enemy_name}. They {enemy_hit} you.".format(
+                player_hit="hit" if player_should_hit else "miss",
+                enemy_name=enemy_name,
+                enemy_hit="hit" if enemy_should_hit else "miss"
+            ),
             "player": {
                 "hp": player_hp if player_hp > 0 else 0
             },
@@ -118,7 +122,7 @@ def attack(request):
             }
         })
 
-    return JsonResponse({"error": "There is no enemy in this room."})
+    return JsonResponse({"message": "There is no enemy in this room."})
 @csrf_exempt
 @api_view(["POST"])
 def say(request):
