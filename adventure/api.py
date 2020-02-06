@@ -14,13 +14,19 @@ import random
 # instantiate pusher
 # pusher = Pusher(app_id=config('PUSHER_APP_ID'), key=config('PUSHER_KEY'), secret=config('PUSHER_SECRET'), cluster=config('PUSHER_CLUSTER'))
 
+def update(request):
+    player = request.user.player
+    room = player.currentRoom
+
+    return {"title": room.title, "description": room.description}
+
 @api_view(["GET"])
 def initialize(request):
     user = request.user
     player = user.player
     player_id = player.id
     uuid = player.uuid
-    room = player.room()
+    room = player.currentRoom
     players = room.playerNames(player_id)
     return JsonResponse({'uuid': uuid, 'name': player.user.username, 'title': room.title, 'description': room.description, 'players': players}, safe=True)
 

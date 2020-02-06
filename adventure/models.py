@@ -90,12 +90,6 @@ class Player(models.Model):
         if self.currentRoom == 0:
             self.currentRoom = Room.objects.first().id
             self.save()
-    def room(self):
-        try:
-            return Room.objects.get(id=self.currentRoom)
-        except Room.DoesNotExist:
-            self.initialize()
-            return self.room()
     
     def __str__(self):
         return self.user.username
