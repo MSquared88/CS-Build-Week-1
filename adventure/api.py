@@ -29,7 +29,7 @@ def initialize(request):
     room = player.currentRoom
     enemy = player.currentRoom.enemy
     players = room.playerNames(player_id)
-    data = {'uuid': uuid, 'name': 'room_id': room.id, player.user.username, 'hp': player.hp, 'title': room.title, 'description': room.description, 'players': players}
+    data = {'uuid': uuid, 'name': player.user.username, 'room_id': room.id, 'hp': player.hp, 'title': room.title, 'description': room.description, 'players': players}
 
     if enemy:
         data['enemy'] = {'name': enemy.enemy.name, 'description': enemy.enemy.description, 'hp': enemy.hp}
