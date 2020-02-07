@@ -29,7 +29,7 @@ def initialize(request):
     room = player.currentRoom
     enemy = player.currentRoom.enemy
     players = room.playerNames(player_id)
-    data = {'uuid': uuid, 'name': player.user.username, 'hp': player.hp, 'title': room.title, 'description': room.description, 'players': players}
+    data = {'uuid': uuid, 'name': 'room_id': room.id, player.user.username, 'hp': player.hp, 'title': room.title, 'description': room.description, 'players': players}
 
     if enemy:
         data['enemy'] = {'name': enemy.enemy.name, 'description': enemy.enemy.description, 'hp': enemy.hp}
@@ -68,7 +68,7 @@ def move(request):
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has walked {dirs[direction]}.'})
         # for p_uuid in nextPlayerUUIDs:
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has entered from the {reverse_dirs[direction]}.'})
-        data = {'name': player.user.username, 'title': nextRoom.title, 'description': nextRoom.description, 'players': players, 'error_msg': ""}
+        data = {'room_id': nextRoom.id, 'name': player.user.username, 'title': nextRoom.title, 'description': nextRoom.description, 'players': players, 'error_msg': ""}
 
         if nextRoom.enemy:
             data['enemy'] = {'name': nextRoom.enemy.enemy.name, 'description': nextRoom.enemy.enemy.description, 'hp': nextRoom.enemy.hp}
@@ -115,6 +115,7 @@ def attack(request):
                 'hp': player.hp,
                 'title': player.currentRoom.title,
                 'description': player.currentRoom.description,
+                'room_id': player.currentRoom.id,
                 'players': players
             }
             
