@@ -32,7 +32,7 @@ def initialize(request):
     data = {'uuid': uuid, 'name': player.user.username, 'hp': player.hp, 'title': room.title, 'description': room.description, 'players': players}
 
     if enemy:
-        data['enemy'] = {'name': enemy.enemy.name, 'hp': enemy.hp}
+        data['enemy'] = {'name': enemy.enemy.name, 'description': enemy.enemy.description, 'hp': enemy.hp}
 
     return JsonResponse(data, safe=True)
 
@@ -71,7 +71,7 @@ def move(request):
         data = {'name': player.user.username, 'title': nextRoom.title, 'description': nextRoom.description, 'players': players, 'error_msg': ""}
 
         if nextRoom.enemy:
-            data['enemy'] = {'name': nextRoom.enemy.enemy.name, 'hp': nextRoom.enemy.hp}
+            data['enemy'] = {'name': nextRoom.enemy.enemy.name, 'description': nextRoom.enemy.enemy.description, 'hp': nextRoom.enemy.hp}
 
         return JsonResponse(data, safe=True)
     else:
@@ -119,7 +119,7 @@ def attack(request):
             }
             
             if player.currentRoom.enemy:
-                data['enemy'] = {'name': player.currentRoom.enemy.enemy.name, 'hp': player.currentRoom.enemy.hp}
+                data['enemy'] = {'name': player.currentRoom.enemy.enemy.name, 'description': player.currentRoom.enemy.enemy.description,  'hp': player.currentRoom.enemy.hp}
 
             return JsonResponse(data, safe=True)
 
